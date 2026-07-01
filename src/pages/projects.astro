@@ -1,0 +1,211 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const projects = [
+  {
+    number: '01',
+    title: 'Project AIGRI',
+    subtitle: 'at Google Bangkok',
+    period: 'Jul – Oct 2025',
+    stack: ['Python', 'Flask', 'OpenCV', 'ResNet-50'],
+    highlights: [
+      'Architected the backend system and AI pipeline for an automated crop insurance platform designed to quantify agricultural damage via drone imagery.',
+      'Integrated a pre-trained ResNet-50 computer vision model to automate crop damage classification, significantly reducing manual verification time for insurance claims.',
+      'Designed and deployed a RESTful API using Flask to ensure secure data flow between the image ingestion engine and the user reporting interface.',
+    ],
+  },
+  {
+    number: '02',
+    title: 'Stealth',
+    subtitle: 'rSCENE Hackathon — 5th Place Overall',
+    period: 'June 2025',
+    stack: ['Python', 'Flask', 'PostgreSQL'],
+    highlights: [
+      'Led a development team to win 5th Place Overall at the Regional Smart Communities Exposition Hackathon.',
+      'Developed backend services using Python and Flask, implementing robust data structures to handle game logic and user experience optimization.',
+      'Managed the project lifecycle from ideation to pitch, ensuring the prototype was delivered within strict hackathon time constraints.',
+    ],
+  },
+  {
+    number: '03',
+    title: 'General Laboratory IMS',
+    subtitle: 'UP Tacloban',
+    period: 'Feb – Apr 2025',
+    stack: ['Java', 'MySQL', 'JDBC'],
+    highlights: [
+      'Engineered a comprehensive desktop application for UP Tacloban to manage laboratory equipment and materials inventory.',
+      'Designed a normalized MySQL database architecture to track equipment categorization and real-time availability across multiple departments.',
+      'Streamlined manual inventory tracking processes, reducing administrative overhead for laboratory personnel.',
+    ],
+  },
+];
+---
+
+<Layout title="Projects" description="Projects by Rolf Garces — AI systems, backend APIs, and tools that solve real problems.">
+
+  <section class="section bg-surface page-hero">
+    <div class="glow-blob" style="width: 400px; height: 400px; top: -50px; right: 0; opacity: 0.15;"></div>
+    <div class="container">
+      <p class="label-md section-eyebrow">My Work</p>
+      <h1 class="display-lg page-title">Projects</h1>
+      <p class="body-lg page-desc">
+        A collection of things I've built &mdash; AI pipelines, backend systems,
+        and tools designed to solve real problems.
+      </p>
+    </div>
+  </section>
+
+  <section class="section bg-surface-lowest">
+    <div class="container">
+      <div class="projects-list">
+        {projects.map((project, i) => (
+          <article class:list={['project', { 'project--offset': i % 2 !== 0 }]}>
+            <div class="project-header">
+              <span class="label-md project-number">{project.number}</span>
+              <div class="project-tags">
+                {project.stack.map(s => <span class="tag">{s}</span>)}
+              </div>
+              <span class="label-md project-period">{project.period}</span>
+            </div>
+
+            <div class="project-body glass-card">
+              <div class="project-accent"></div>
+              <div class="project-text">
+                <h2 class="headline-md project-title">{project.title}</h2>
+                <p class="label-md project-subtitle">{project.subtitle}</p>
+                <ul class="project-highlights">
+                  {project.highlights.map(h => (
+                    <li class="body-lg highlight-item">{h}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+  /* Page hero */
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+    padding-top: 8rem;
+    padding-bottom: 3rem;
+  }
+
+  .page-title {
+    color: var(--on-surface);
+    margin-bottom: 1.25rem;
+  }
+
+  .page-desc {
+    max-width: 520px;
+  }
+
+  /* Projects */
+  .projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  .project {
+    position: relative;
+  }
+
+  /* Alternating indent for editorial asymmetry */
+  .project--offset {
+    margin-left: clamp(0px, 6vw, 4rem);
+  }
+
+  .project-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .project-number {
+    color: var(--primary);
+  }
+
+  .project-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+
+  .project-period {
+    margin-left: auto;
+  }
+
+  /* Card body with internal accent panel */
+  .project-body {
+    display: grid;
+    grid-template-columns: 6px 1fr;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  .project-accent {
+    background: linear-gradient(180deg, var(--primary), var(--primary-container));
+    border-radius: 0.75rem 0 0 0.75rem;
+  }
+
+  .project-text {
+    padding: 2rem 2.5rem;
+  }
+
+  .project-title {
+    color: var(--on-surface);
+    margin-bottom: 0.4rem;
+  }
+
+  .project-subtitle {
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+  }
+
+  .project-highlights {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .highlight-item {
+    padding-left: 1rem;
+    border-left: none;
+    position: relative;
+  }
+
+  .highlight-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+
+  @media (max-width: 640px) {
+    .project-period {
+      display: none;
+    }
+
+    .project-text {
+      padding: 1.5rem;
+    }
+
+    .project--offset {
+      margin-left: 0;
+    }
+  }
+</style>

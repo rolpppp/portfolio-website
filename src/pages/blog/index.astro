@@ -1,0 +1,74 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Blog" description="Writing by Rolf Garces — thoughts on AI, engineering, and life as a CS student.">
+
+  <section class="section bg-surface page-hero">
+    <div class="glow-blob" style="width: 400px; height: 400px; top: -50px; right: 0; opacity: 0.12;"></div>
+    <div class="container">
+      <p class="label-md section-eyebrow">Writing</p>
+      <h1 class="display-lg page-title">Blog</h1>
+      <p class="body-lg page-desc">
+        Thoughts on AI, engineering, and life as a CS student.
+        Coming soon.
+      </p>
+    </div>
+  </section>
+
+  <section class="section bg-surface-lowest">
+    <div class="container">
+      <div class="placeholder glass-card">
+        <div class="placeholder-inner">
+          <p class="label-md placeholder-label">In Progress</p>
+          <h2 class="headline-md placeholder-title">Posts are on the way.</h2>
+          <p class="body-lg">
+            I'll be writing about things I'm learning, building, and thinking about &mdash;
+            from AI and backend development to navigating a CS degree in the Philippines.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+    padding-top: 8rem;
+    padding-bottom: 3rem;
+  }
+
+  .page-title {
+    color: var(--on-surface);
+    margin-bottom: 1.25rem;
+  }
+
+  .page-desc {
+    max-width: 480px;
+  }
+
+  .placeholder {
+    padding: 4rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .placeholder-inner {
+    max-width: 500px;
+    text-align: center;
+  }
+
+  .placeholder-label {
+    color: var(--primary);
+    margin-bottom: 1rem;
+  }
+
+  .placeholder-title {
+    color: var(--on-surface);
+    margin-bottom: 1rem;
+  }
+</style>
