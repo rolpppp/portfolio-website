@@ -2,18 +2,16 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://rolpppp.github.io',
-
-  // Uncomment and set to your repo name when deploying as a project site:
-  // base: '/portfolio-website',
+  site: 'https://rolf-garces.tech',
   output: 'static',
 
   vite: {
     plugins: [tailwindcss()],
   },
 
-  integrations: [react()],
+  integrations: [react(), sitemap()],
 });
