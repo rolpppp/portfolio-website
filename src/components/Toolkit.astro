@@ -1,0 +1,137 @@
+---
+// Engineering Toolkit — technologies clustered into ecosystems
+// (design-brief.md §6). No progress bars, no skill percentages, no scored
+// list: quiet tag clusters in the mono data voice. The only number shown is
+// the honest one — how many instruments are in each cluster.
+//
+// Fixed roster, so it lives here rather than in a content collection
+// (collections are for expeditions / research / writing per CLAUDE.md).
+
+interface Cluster {
+  name: string;
+  tags: string[];
+}
+
+// Tags drawn from the resume and the shipped expeditions. Frameworks is a
+// deliberate roll-up index of what appears in the domain clusters.
+const CLUSTERS: Cluster[] = [
+  {
+    name: "Languages",
+    tags: ["Python", "Java", "JavaScript", "PHP", "Dart", "SQL", "HTML/CSS"],
+  },
+  {
+    name: "Backend",
+    tags: ["Flask", "Laravel", "CodeIgniter 3 & 4", "RESTful APIs", "JDBC"],
+  },
+  {
+    name: "Frontend",
+    tags: ["React", "Astro", "Tailwind CSS", "GSAP", "Vanilla JS"],
+  },
+  {
+    name: "AI",
+    tags: ["TensorFlow", "PyTorch", "Pandas", "NumPy", "Transfer Learning"],
+  },
+  {
+    name: "Computer Vision",
+    tags: ["OpenCV", "ResNet-50", "Image Classification", "Drone Imagery Analysis"],
+  },
+  {
+    name: "Databases",
+    tags: ["PostgreSQL", "MySQL", "SQLite", "Schema Design & Normalization", "Query Optimization"],
+  },
+  {
+    name: "Cloud",
+    tags: ["AWS EC2", "AWS RDS", "Docker", "Hestia CP", "Production Staging"],
+  },
+  {
+    name: "Mobile",
+    tags: ["Flutter", "Dart", "Offline-first Storage"],
+  },
+  {
+    name: "GIS",
+    tags: ["Drone Imagery Pipelines", "Geospatial Data Handling"],
+  },
+  {
+    name: "Developer Tools",
+    tags: ["Git", "GitHub", "VS Code", "IntelliJ", "Docker"],
+  },
+  {
+    name: "Frameworks",
+    tags: ["Flask", "Flutter", "React", "Laravel", "CodeIgniter", "TensorFlow", "Astro"],
+  },
+  {
+    name: "Concepts",
+    tags: [
+      "Data Structures & Algorithms",
+      "Object-Oriented Programming",
+      "Database Management",
+      "Software Engineering",
+      "Automata Theory",
+      "Artificial Intelligence",
+    ],
+  },
+];
+---
+
+<section id="toolkit" class="relative bg-paper px-6 py-32 md:px-12 md:py-40 lg:px-20">
+  <div class="mx-auto max-w-6xl">
+    <header class="max-w-2xl">
+      <p class="font-mono text-xs uppercase tracking-[0.25em] text-ink/70">
+        Instruments · {CLUSTERS.length} Ecosystems
+      </p>
+      <h2 class="mt-6 font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.95] font-light tracking-tight text-ink">
+        Engineering Toolkit
+      </h2>
+      <p class="mt-8 max-w-xl font-sans text-base leading-relaxed text-ink/80 md:text-lg">
+        The instruments carried on every expedition — clustered by ecosystem,
+        not scored. What matters is what they've built.
+      </p>
+    </header>
+
+    <div class="mt-16 columns-1 gap-5 md:columns-2 lg:columns-3">
+      {CLUSTERS.map((cluster, i) => (
+        <article
+          data-toolkit-cluster
+          class="mb-5 break-inside-avoid rounded-sm border border-ink/10 bg-paper-alt/50 p-6 transition-colors hover:border-ink/30"
+        >
+          <div class="flex items-baseline justify-between gap-4">
+            <p class="font-mono text-[11px] tracking-[0.2em] text-ink/60 uppercase">
+              SYS {String(i + 1).padStart(2, "0")}
+            </p>
+            <p class="font-mono text-[10px] tracking-[0.16em] text-ink/40 uppercase">
+              ×{cluster.tags.length}
+            </p>
+          </div>
+          <h3 class="mt-2 font-display text-xl font-light tracking-tight text-ink md:text-2xl">
+            {cluster.name}
+          </h3>
+          <ul class="mt-4 flex flex-wrap gap-2">
+            {cluster.tags.map((tag) => (
+              <li class="rounded-sm border border-ink/15 px-2.5 py-1 font-mono text-[10px] tracking-[0.12em] text-ink/70 uppercase">
+                {tag}
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initMotion, prefersReducedMotion } from "../lib/motion";
+
+  // Quiet one-time fade-up per cluster — same restraint as the other sections.
+  if (!prefersReducedMotion()) {
+    const { gsap } = initMotion();
+    gsap.utils.toArray<HTMLElement>("[data-toolkit-cluster]").forEach((el) => {
+      gsap.from(el, {
+        y: 24,
+        opacity: 0,
+        duration: 0.7,
+        ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 90%" },
+      });
+    });
+  }
+</script>

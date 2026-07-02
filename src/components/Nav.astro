@@ -1,0 +1,55 @@
+---
+import MobileNav from "../islands/MobileNav";
+
+const LINKS = [
+  { label: "Home", href: "#home" },
+  { label: "Journey", href: "#journey" },
+  { label: "Projects", href: "#projects" },
+  { label: "Research", href: "#research" },
+  { label: "Writing", href: "#writing" },
+  { label: "Toolkit", href: "#toolkit" },
+  { label: "Contact", href: "#contact" },
+];
+---
+
+<header class="fixed inset-x-0 top-0 z-50" data-nav>
+  <nav
+    class="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-5 transition-[background-color,box-shadow,backdrop-filter] duration-300 md:px-12"
+    data-nav-inner
+  >
+    <a href="#home" class="font-display text-lg tracking-tight text-ink">RG</a>
+    <ul class="hidden items-center gap-8 font-mono text-[11px] tracking-[0.16em] text-ink/70 uppercase lg:flex">
+      {LINKS.map((link) => (
+        <li>
+          <a href={link.href} class="transition-colors hover:text-ocean">
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <a
+      href="#contact"
+      class="hidden font-mono text-[11px] tracking-[0.16em] text-ocean uppercase transition-colors hover:text-ink lg:inline-block"
+    >
+      Get in touch
+    </a>
+
+    <MobileNav links={LINKS} client:visible />
+  </nav>
+</header>
+
+<script>
+  const nav = document.querySelector<HTMLElement>("[data-nav-inner]");
+
+  function updateNavState() {
+    if (!nav) return;
+    if (window.scrollY > 24) {
+      nav.classList.add("bg-paper/80", "backdrop-blur-md", "shadow-[0_1px_0_rgba(18,53,36,0.08)]");
+    } else {
+      nav.classList.remove("bg-paper/80", "backdrop-blur-md", "shadow-[0_1px_0_rgba(18,53,36,0.08)]");
+    }
+  }
+
+  updateNavState();
+  window.addEventListener("scroll", updateNavState, { passive: true });
+</script>

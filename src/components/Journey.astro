@@ -1,0 +1,486 @@
+---
+// Journey — the expedition route. This is the design's one signature element:
+// the route line draws itself as the visitor scrolls (design-brief.md §2).
+// DrawSVG (paid GreenSock plugin) is unavailable, so the draw uses the standard
+// stroke-dashoffset technique instead — same effect, no license required.
+//
+// Per the design-system composition mockup this section runs on the dark Deep
+// Forest (Ink) background with light text, a deliberate shift from the Hero's
+// paper. The route accent is lightened (#6FA0C7) so it clears WCAG on the dark
+// ground while reading as the same blue that appears on paper elsewhere.
+//
+// Geometry is bearing-driven twice over: each waypoint is displaced east/west
+// across the route canvas by its bearing, and each Bézier segment's control
+// points extend that same heading — so the winding encodes the data rather
+// than being an arbitrary squiggle ("structure is information").
+
+interface Checkpoint {
+  index: string;
+  tag: string; // mono waypoint label
+  bearing: string; // surveyed heading — drives waypoint offset + curve throw
+  years: string; // real period for this leg — VERIFY before shipping
+  title: string;
+  lead: string; // one-line descriptor shown in the summary
+  detail: string; // revealed on interaction
+  media?: { src: string; alt: string; caption: string };
+}
+
+// East component of a "N 34° E"-style bearing, in [-1, 1]: sign and magnitude
+// of how far that waypoint sits (and throws the route) sideways.
+function bearingEast(bearing: string): number {
+  const m = bearing.match(/([\d.]+)\s*°?\s*([EW])/i);
+  if (!m) return 0;
+  const deg = parseFloat(m[1]);
+  const dir = m[2].toUpperCase() === "W" ? -1 : 1;
+  return Math.sin((deg * Math.PI) / 180) * dir;
+}
+
+// TODO(Rolf): the `years` ranges are drawn from the resume timeline
+// (DOST-SEI Scholar since 2023) but are estimates — verify each before
+// shipping. Media images are Unsplash placeholders; swap in real photos
+// or short videos from each milestone when you have them.
+const CHECKPOINTS: Checkpoint[] = [
+  {
+    index: "01",
+    tag: "FOUNDATION",
+    bearing: "N 22° E",
+    years: "2022–2023",
+    title: "Programming Foundations",
+    lead: "Wrote first working programs; learned problem decomposition, debugging, and core language fluency.",
+    detail:
+      "Where the route begins: learning to think in code before thinking in frameworks. Fluency across languages, and the habit of decomposing a messy problem into something a machine can follow.",
+    media: {
+      src: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80&auto=format&fit=crop",
+      alt: "Code editor with early programming exercises on screen",
+      caption: "FIG. 01 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
+    },
+  },
+  {
+    index: "02",
+    tag: "THEORY",
+    bearing: "N 41° W",
+    years: "2023",
+    title: "Algorithms & Data Structures",
+    lead: "Implemented core data structures and algorithms from scratch; learned to reason in time/space complexity.",
+    detail:
+      "The terrain gets technical. Understanding why one approach costs more than another, and how the right structure turns an intractable problem into a tractable one — the groundwork that later made graph-coloring research possible.",
+    media: {
+      src: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&q=80&auto=format&fit=crop",
+      alt: "Whiteboard covered in graph and algorithm sketches",
+      caption: "FIG. 02 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
+    },
+  },
+  {
+    index: "03",
+    tag: "DATA",
+    bearing: "N 33° E",
+    years: "2023–2024",
+    title: "Database Systems",
+    lead: "Designed and normalized relational schemas; wrote and tuned the SQL behind real project databases.",
+    detail:
+      "Relational design, normalization, and query performance. Learning that most software problems are really data problems wearing a costume.",
+    media: {
+      src: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&q=80&auto=format&fit=crop",
+      alt: "Database schema diagrams in a notebook",
+      caption: "FIG. 03 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
+    },
+  },
+  {
+    index: "04",
+    tag: "DISCOVERY",
+    bearing: "N 58° W",
+    years: "2024",
+    title: "Research",
+    lead: "DOST-SEI Scholar; conducted graph-coloring research — hypothesis, experiment, honest measurement.",
+    detail:
+      "A DOST-SEI scholarship and graph-coloring research reframed building as a scientific act: form a hypothesis, test it, measure honestly, and let the result — not the ego — decide what ships.",
+    media: {
+      src: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80&auto=format&fit=crop",
+      alt: "Research materials and glassware on a lab bench",
+      caption: "FIG. 04 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
+    },
+  },
+  {
+    index: "05",
+    tag: "VELOCITY",
+    bearing: "N 27° E",
+    years: "2024–2025",
+    title: "Hackathons",
+    lead: "Top-5 regional finish, then Honorable Mention (top 6 of 70+ teams) at the international APRU Tech Policy Hackathon 2025.",
+    detail:
+      "Compressing the whole arc — idea to demo — into a weekend. A Top-5 finish at the Regional Smart Communities Exposition, then an Honorable Mention at the APRU Tech Policy Hackathon 2025 in Google Bangkok — top 6 among 70+ teams from across Southeast Asia. Both taught more about scope, teamwork, and shipping than any amount of unhurried planning could.",
+    media: {
+      src: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80&auto=format&fit=crop",
+      alt: "Team working on laptops during a hackathon",
+      caption: "FIG. 05 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
+    },
+  },
+  {
+    index: "06",
+    tag: "VENTURE",
+    bearing: "N 47° W",
+    years: "2025",
+    title: "Startup Building",
+    lead: "Validating startup concepts with real users — problem interviews and prototypes before code.",
+    detail:
+      "The Startup Lab: treating ideas as hypotheses about people, validating with real users before writing much code, and learning that the hardest engineering is often deciding what not to build.",
+    media: {
+      src: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80&auto=format&fit=crop",
+      alt: "Sticky notes and product planning on a whiteboard",
+      caption: "FIG. 06 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
+    },
+  },
+  {
+    index: "07",
+    tag: "CRAFT",
+    bearing: "N 38° E",
+    years: "2025–2026",
+    title: "Software Engineering",
+    lead: "Shipped production systems (Lab IMS, AIGRI) — maintainable code, reviews, team collaboration.",
+    detail:
+      "Beyond making it work — making it maintainable, reviewable, and collaborative. Real projects (IMS, AIGRI) where the code has to outlive the moment it was written.",
+    media: {
+      src: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80&auto=format&fit=crop",
+      alt: "Production code under review on a monitor",
+      caption: "FIG. 07 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
+    },
+  },
+  {
+    index: "08",
+    tag: "SCALE",
+    bearing: "N 52° W",
+    years: "2026",
+    title: "Cloud Computing",
+    lead: "Deploying to cloud infrastructure; learning the cost, reliability, and operations trade-offs of scale.",
+    detail:
+      "Infrastructure, deployment, and the economics of running software at scale. The current frontier — where an engineering decision becomes an operational one.",
+    media: {
+      src: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80&auto=format&fit=crop",
+      alt: "Rows of servers in a data-center aisle",
+      caption: "FIG. 08 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
+    },
+  },
+  {
+    index: "09",
+    tag: "FIELD WORK",
+    bearing: "N 44° E",
+    years: "2026",
+    title: "Internship — MYT SoftDev Solutions",
+    lead: "Production engineering at MYT SoftDev Solutions Inc. (Cebu City) — ERP performance work and a ticketing notification system for paying clients.",
+    detail:
+      "First professional deployment: inside MYT SoftDev Solutions' live codebases in Cebu City — profiling and optimizing two client ERP systems (~40% faster loads on the heaviest modules) and closing the notification loop in a support ticketing system. Full field reports: Expeditions 03 & 04.",
+    media: {
+      src: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80&auto=format&fit=crop",
+      alt: "Software development office workspace",
+      caption: "FIG. 09 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
+    },
+  },
+  {
+    index: "10",
+    tag: "HORIZON",
+    bearing: "N 30° W",
+    years: "2026 →",
+    title: "Future Expeditions",
+    lead: "Open to engineering roles and collaboration — harder problems, new domains, real impact.",
+    detail:
+      "What's next is uncharted on purpose. New domains, harder problems, and technology that helps people navigate the real world. Still exploring.",
+  },
+];
+
+// Waypoint position across the route canvas, as a percentage. Bearings
+// alternate E/W, so the pins themselves zigzag — every segment between them
+// is a genuine diagonal, which is what keeps the whole route winding instead
+// of straightening out after the first leg.
+const positioned = CHECKPOINTS.map((cp) => ({
+  ...cp,
+  xPercent: 50 + bearingEast(cp.bearing) * 34,
+}));
+
+// Background contours: long, low-curvature survey arcs sweeping down the
+// section's right side. Texture only — near-background tone, never competing
+// with the route ("environment supports, never competes").
+const CONTOURS = Array.from({ length: 8 }, (_, i) => {
+  const x = 780 + i * 86;
+  return {
+    d: `M ${x} -120 C ${x - 230} 420, ${x - 70} 920, ${x + 170} 1340 C ${x + 320} 1610, ${x + 290} 2010, ${x + 200} 2560`,
+    opacity: 0.1 - i * 0.005,
+  };
+});
+---
+
+<section id="journey" class="relative isolate overflow-hidden bg-ink px-6 py-32 text-paper md:px-12 md:py-40 lg:px-20">
+  <svg
+    class="pointer-events-none absolute inset-0 -z-10 h-full w-full"
+    viewBox="0 0 1440 2400"
+    preserveAspectRatio="xMidYMid slice"
+    aria-hidden="true"
+    focusable="false"
+  >
+    {CONTOURS.map((c) => (
+      <path d={c.d} fill="none" stroke="var(--color-paper)" stroke-width="1" opacity={c.opacity} />
+    ))}
+  </svg>
+
+  <div class="mx-auto max-w-6xl">
+    <header class="max-w-2xl">
+      <p class="font-mono text-xs uppercase tracking-[0.25em] text-paper/70">
+        The Route · {String(CHECKPOINTS.length).padStart(2, "0")} Checkpoints
+      </p>
+      <h2 class="mt-6 font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.95] font-light tracking-tight text-paper">
+        The Journey
+      </h2>
+      <p class="mt-8 max-w-xl font-sans text-base leading-relaxed text-paper/80 md:text-lg">
+        Every skill I have was a checkpoint on the way here. The route runs from
+        first principles to the systems I build today — and it keeps going.
+      </p>
+    </header>
+
+    <ol data-route-list class="relative mt-20">
+      <svg
+        data-route-svg
+        class="pointer-events-none absolute left-0 top-0 h-full w-[5rem] overflow-visible md:w-[16rem] lg:w-[22rem]"
+        aria-hidden="true"
+        focusable="false"
+        preserveAspectRatio="none"
+      >
+        <path data-route-base fill="none" stroke="var(--color-paper)" stroke-width="1.5" stroke-dasharray="2 6" stroke-linecap="round" opacity="0.18"></path>
+        <path data-route-draw fill="none" stroke="#6FA0C7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+
+      {positioned.map((cp) => (
+        <li data-checkpoint class="grid grid-cols-[5rem_1fr] md:grid-cols-[16rem_1fr] lg:grid-cols-[22rem_1fr]">
+          <div class="relative pt-1.5">
+            {/* Survey-pin marker, displaced across the canvas by its bearing. */}
+            <span
+              data-route-node
+              data-bearing={cp.bearing}
+              class="absolute top-1.5 mt-px flex h-4 w-4 -translate-x-1/2 items-center justify-center"
+              style={`left: ${cp.xPercent.toFixed(1)}%`}
+            >
+              <span class="pointer-events-none absolute h-px w-7 bg-gold/70" aria-hidden="true"></span>
+              <span data-node-dot class="relative block h-2.5 w-2.5 rounded-full border-2 border-paper/40 transition-colors duration-500"></span>
+            </span>
+          </div>
+
+          <details class="group border-b border-paper/15 pb-8">
+            <summary class="flex cursor-pointer list-none items-start justify-between gap-6 pt-0.5 [&::-webkit-details-marker]:hidden">
+              <div>
+                <p class="font-mono text-[11px] tracking-[0.2em] text-paper/60 uppercase">
+                  {cp.index} · {cp.tag} · {cp.bearing} · {cp.years}
+                </p>
+                <h3 class="mt-2 font-display text-2xl font-light tracking-tight text-paper md:text-3xl">
+                  {cp.title}
+                </h3>
+                <p class="mt-2 max-w-xl font-sans text-sm leading-relaxed text-paper/70 md:text-base">
+                  {cp.lead}
+                </p>
+              </div>
+              <span
+                class="mt-1 shrink-0 font-mono text-lg leading-none text-paper/40 transition-transform duration-300 group-open:rotate-45"
+                aria-hidden="true"
+              >+</span>
+            </summary>
+
+            {/* Field-log entry: artifact + notes, not just more paragraph. */}
+            <div class="mt-6 grid gap-6 md:grid-cols-[minmax(0,17rem)_1fr]">
+              {cp.media && (
+                <figure>
+                  <img
+                    src={cp.media.src}
+                    alt={cp.media.alt}
+                    loading="lazy"
+                    decoding="async"
+                    class="aspect-[4/3] w-full rounded-sm border border-paper/10 object-cover"
+                  />
+                  <figcaption class="mt-2 font-mono text-[10px] tracking-[0.16em] text-paper/50 uppercase">
+                    {cp.media.caption}
+                  </figcaption>
+                </figure>
+              )}
+              <p class="max-w-xl font-sans text-sm leading-relaxed text-paper/70 md:text-base">
+                {cp.detail}
+              </p>
+            </div>
+          </details>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<script>
+  import { initMotion, prefersReducedMotion } from "../lib/motion";
+
+  const section = document.querySelector<HTMLElement>("#journey");
+  const svg = section?.querySelector<SVGSVGElement>("[data-route-svg]");
+  const basePath = svg?.querySelector<SVGPathElement>("[data-route-base]");
+  const drawPath = svg?.querySelector<SVGPathElement>("[data-route-draw]");
+  const nodes = section
+    ? Array.from(section.querySelectorAll<HTMLElement>("[data-route-node]"))
+    : [];
+  const dots = nodes.map((n) => n.querySelector<HTMLElement>("[data-node-dot]"));
+  const checkpoints = section
+    ? Array.from(section.querySelectorAll<HTMLElement>("[data-checkpoint]"))
+    : [];
+
+  // Journey-only route accent (lightened Ocean Blue — WCAG-safe on Deep Forest).
+  const ROUTE = "#6FA0C7";
+
+  if (section && svg && basePath && drawPath && nodes.length > 1) {
+    const reduce = prefersReducedMotion();
+
+    let drawLength = 0;
+    let nodeLengths: number[] = [];
+    let segLengths: number[] = [];
+    const segProgress: number[] = new Array(nodes.length - 1).fill(0);
+
+    // Build the route as a Catmull-Rom spline through every measured waypoint.
+    // The pins zigzag by bearing (that's what makes the route wind); the
+    // spline shares one tangent per pin — the incoming and outgoing control
+    // points are mirror images across the node — so the line flows straight
+    // through each waypoint with no dip/bounce kink at the marker.
+    function buildPath() {
+      const svgRect = svg.getBoundingClientRect();
+      const w = svgRect.width;
+      const h = svgRect.height;
+
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+
+      const pts = nodes.map((node) => {
+        const r = node.getBoundingClientRect();
+        return {
+          x: r.left - svgRect.left + r.width / 2,
+          y: r.top - svgRect.top + r.height / 2,
+        };
+      });
+
+      // Tangent at each pin: direction from the previous pin to the next one
+      // (endpoints use their single neighbor). C1-continuous by construction.
+      const tangents = pts.map((p, i) => {
+        const prev = pts[Math.max(0, i - 1)];
+        const next = pts[Math.min(pts.length - 1, i + 1)];
+        return { x: (next.x - prev.x) / 2, y: (next.y - prev.y) / 2 };
+      });
+
+      // Cubic segment from node i-1 to node i, Catmull-Rom style: exit control
+      // follows the previous pin's tangent, entry control opposes this pin's.
+      const seg = (i: number) => {
+        const a = pts[i - 1];
+        const b = pts[i];
+        const ta = tangents[i - 1];
+        const tb = tangents[i];
+        const c1x = a.x + ta.x / 1.5;
+        const c1y = a.y + ta.y / 1.5;
+        const c2x = b.x - tb.x / 1.5;
+        const c2y = b.y - tb.y / 1.5;
+        return ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+      };
+
+      let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+      for (let i = 1; i < pts.length; i++) d += seg(i);
+
+      basePath.setAttribute("d", d);
+      drawPath.setAttribute("d", d);
+      drawLength = drawPath.getTotalLength();
+
+      // Cumulative length up to each waypoint (measured on the base path), so
+      // markers can light up as the drawn tip reaches them.
+      nodeLengths = pts.map((_, i) => {
+        if (i === 0) return 0;
+        let pd = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+        for (let k = 1; k <= i; k++) pd += seg(k);
+        basePath.setAttribute("d", pd);
+        return basePath.getTotalLength();
+      });
+      basePath.setAttribute("d", d);
+
+      segLengths = nodeLengths.slice(1).map((l, i) => l - nodeLengths[i]);
+    }
+
+    function setMarkers(drawn: number) {
+      dots.forEach((dot, i) => {
+        if (!dot) return;
+        const active = drawn >= nodeLengths[i] - 0.5;
+        dot.style.borderColor = active ? ROUTE : "";
+        dot.style.backgroundColor = active ? ROUTE : "";
+      });
+    }
+
+    // Drawn length is the sum of each segment's own scroll progress. Because
+    // the segments sequence down the page, this always reveals a continuous
+    // prefix of the path — no gaps — while letting each checkpoint draw its own
+    // leg as it scrolls into view.
+    function applyDraw() {
+      let drawn = 0;
+      for (let i = 0; i < segLengths.length; i++) {
+        drawn += segProgress[i] * segLengths[i];
+      }
+      drawPath.style.strokeDashoffset = `${drawLength - drawn}`;
+      setMarkers(drawn);
+    }
+
+    buildPath();
+
+    if (reduce) {
+      // No draw animation — show the finished route and every waypoint.
+      drawPath.style.strokeDasharray = "none";
+      drawPath.style.strokeDashoffset = "0";
+      setMarkers(drawLength);
+    } else {
+      const { gsap, ScrollTrigger } = initMotion();
+      let drawTriggers: ScrollTrigger[] = [];
+
+      function setupDraw() {
+        drawPath.style.strokeDasharray = `${drawLength}`;
+        drawPath.style.strokeDashoffset = `${drawLength}`;
+        applyDraw();
+
+        // One scrubbed trigger per leg, tied to the checkpoint it arrives at:
+        // that leg draws as its checkpoint moves from the lower viewport up
+        // into the reading zone.
+        drawTriggers = checkpoints.slice(1).map((cp, i) =>
+          ScrollTrigger.create({
+            trigger: cp,
+            start: "top 92%",
+            end: "top 42%",
+            scrub: true,
+            onUpdate: (self) => {
+              segProgress[i] = self.progress;
+              applyDraw();
+            },
+          })
+        );
+      }
+
+      setupDraw();
+
+      // Soft fade-up for each checkpoint — quiet, one-time, never competing
+      // with the route draw.
+      gsap.utils.toArray<HTMLElement>("[data-checkpoint]").forEach((el) => {
+        gsap.from(el, {
+          y: 24,
+          opacity: 0,
+          duration: 0.7,
+          ease: "power2.out",
+          scrollTrigger: { trigger: el, start: "top 88%" },
+        });
+      });
+
+      // Rebuild the path when the list changes height (resize, or a checkpoint
+      // expanding) so the route and waypoints stay aligned. Segment progress is
+      // preserved so the drawn amount doesn't jump.
+      let raf = 0;
+      const list = section.querySelector<HTMLElement>("[data-route-list]");
+      const rebuild = () => {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          drawTriggers.forEach((t) => t.kill());
+          buildPath();
+          setupDraw();
+          ScrollTrigger.refresh();
+        });
+      };
+      if (list) new ResizeObserver(rebuild).observe(list);
+    }
+  }
+</script>

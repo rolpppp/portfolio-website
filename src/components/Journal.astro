@@ -1,0 +1,143 @@
+---
+// Writing · Currently Exploring · Beyond Code (design-brief.md §7) — three
+// short-form blocks sharing one quiet section. This is where the page's
+// restraint matters most, right before Contact: smaller headings, hairline
+// rows, no cards competing for attention.
+//
+// Runs on the dark Deep Forest ground (same treatment Journey established,
+// same lightened-ocean link tint) so it reads as its own chapter — distinct
+// from the paper Toolkit above and the bright Contact close below.
+import { getCollection } from "astro:content";
+
+const pieces = (await getCollection("writing")).sort((a, b) => {
+  // Published (dated) first, newest at top; drafts follow.
+  const ad = a.data.date?.valueOf() ?? 0;
+  const bd = b.data.date?.valueOf() ?? 0;
+  return bd - ad;
+});
+
+const dateFmt = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "short" });
+
+// Living list — update freely; recency is the point.
+const EXPLORING = [
+  "Cloud architecture beyond a single EC2 box",
+  "PyTorch past the transfer-learning comfort zone",
+  "How startups validate before they build",
+  "Writing about engineering, in public",
+];
+
+// Concise and human — resume-backed, not decoration.
+const BEYOND = [
+  {
+    label: "Teaching",
+    line: "Tutoring programming fundamentals at BrainBox — watching a concept click is still the best part.",
+  },
+  {
+    label: "Community",
+    line: "DEVCON campus ambassador, organizing workshops that bridge students and industry.",
+  },
+  {
+    label: "Leadership",
+    line: "Former Vice President, UP Interactive Society.",
+  },
+  {
+    label: "Off the map",
+    line: "Exploring Tacloban's food scene — field research for BiteSpot, allegedly.",
+  },
+];
+---
+
+<section class="relative bg-ink px-6 py-24 text-paper md:px-12 md:py-32 lg:px-20">
+  <div class="mx-auto max-w-6xl">
+    <div id="writing" class="scroll-mt-24">
+      <p class="font-mono text-xs uppercase tracking-[0.25em] text-paper/70">
+        Dispatches
+      </p>
+      <h2 class="mt-4 font-display text-3xl font-light tracking-tight text-paper md:text-4xl">
+        Writing
+      </h2>
+
+      <ul class="mt-10 border-t border-paper/15">
+        {pieces.map((piece) => (
+          <li data-journal-row class="grid gap-2 border-b border-paper/15 py-6 md:grid-cols-[10rem_1fr_auto] md:items-baseline md:gap-8">
+            <p class="font-mono text-[11px] tracking-[0.16em] text-paper/50 uppercase">
+              {piece.data.category}
+            </p>
+            <div>
+              {piece.data.url && !piece.data.draft ? (
+                <a href={piece.data.url} class="group font-display text-xl font-light tracking-tight text-paper transition-colors hover:text-[#6FA0C7] md:text-2xl">
+                  {piece.data.title}
+                  <span class="ml-2 inline-block transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+                </a>
+              ) : (
+                <p class="font-display text-xl font-light tracking-tight text-paper/85 md:text-2xl">
+                  {piece.data.title}
+                </p>
+              )}
+              <p class="mt-1.5 max-w-xl font-sans text-sm leading-relaxed text-paper/60">
+                {piece.data.description}
+              </p>
+            </div>
+            <p class="font-mono text-[10px] tracking-[0.16em] text-paper/45 uppercase md:text-right">
+              {piece.data.draft ? "In draft" : piece.data.date ? dateFmt.format(piece.data.date) : ""}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="mt-24 grid gap-16 md:grid-cols-2">
+      <div id="exploring" data-journal-row>
+        <p class="font-mono text-xs uppercase tracking-[0.25em] text-paper/70">
+          Live Log
+        </p>
+        <h2 class="mt-4 font-display text-3xl font-light tracking-tight text-paper md:text-4xl">
+          Currently Exploring
+        </h2>
+        <ul class="mt-8 space-y-3.5">
+          {EXPLORING.map((item) => (
+            <li class="flex items-baseline gap-3 font-sans text-sm leading-relaxed text-paper/75 md:text-base">
+              <span class="inline-block h-px w-4 shrink-0 translate-y-[-0.2em] bg-gold/80" aria-hidden="true"></span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div id="beyond-code" data-journal-row>
+        <p class="font-mono text-xs uppercase tracking-[0.25em] text-paper/70">
+          Off Duty
+        </p>
+        <h2 class="mt-4 font-display text-3xl font-light tracking-tight text-paper md:text-4xl">
+          Beyond Code
+        </h2>
+        <ul class="mt-8 space-y-5">
+          {BEYOND.map((item) => (
+            <li>
+              <p class="font-mono text-[10px] tracking-[0.2em] text-paper/50 uppercase">{item.label}</p>
+              <p class="mt-1 font-sans text-sm leading-relaxed text-paper/75 md:text-base">{item.line}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initMotion, prefersReducedMotion } from "../lib/motion";
+
+  // Quiet one-time fade-up — kept minimal in the page's calmest stretch.
+  if (!prefersReducedMotion()) {
+    const { gsap } = initMotion();
+    gsap.utils.toArray<HTMLElement>("[data-journal-row]").forEach((el) => {
+      gsap.from(el, {
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 90%" },
+      });
+    });
+  }
+</script>

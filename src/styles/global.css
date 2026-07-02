@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  /* Cartographic design system — color */
+  --color-paper: #f5f3ee;
+  --color-paper-alt: #ece9e1;
+  --color-ink: #123524;
+  --color-ocean: #2e5f94;
+  --color-ocean-large: #3a78b8;
+  --color-gold: #c59d5f;
+  --color-moss: #5e8b52;
+
+  /* Typography */
+  --font-display: "Fraunces", serif;
+  --font-sans: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+}

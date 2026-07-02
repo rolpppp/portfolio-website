@@ -1,0 +1,89 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+
+function midpoint(a: number[], b: number[]) {
+  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+}
+
+// Smooths a closed ring of points into an organic contour-line path,
+// using quadratic curves through segment midpoints (no external deps).
+function smoothClosedPath(points: number[][]) {
+  const n = points.length;
+  const start = midpoint(points[n - 1], points[0]);
+  let d = `M ${start[0].toFixed(1)} ${start[1].toFixed(1)}`;
+  for (let i = 0; i < n; i++) {
+    const curr = points[i];
+    const next = points[(i + 1) % n];
+    const m = midpoint(curr, next);
+    d += ` Q ${curr[0].toFixed(1)} ${curr[1].toFixed(1)} ${m[0].toFixed(1)} ${m[1].toFixed(1)}`;
+  }
+  return d + " Z";
+}
+
+// A single wavy "elevation" ring, distorted with a few stacked sine
+// frequencies so rings read as topographic contours, not perfect circles.
+function contourRing(cx: number, cy: number, baseRadius: number, seed: number) {
+  const segments = 48;
+  const points: number[][] = [];
+  for (let i = 0; i < segments; i++) {
+    const angle = (i / segments) * Math.PI * 2;
+    const noise =
+      Math.sin(angle * 3 + seed) * baseRadius * 0.07 +
+      Math.sin(angle * 5 + seed * 1.7) * baseRadius * 0.03 +
+      Math.sin(angle * 2 + seed * 0.6) * baseRadius * 0.09;
+    const r = baseRadius + noise;
+    points.push([cx + Math.cos(angle) * r, cy + Math.sin(angle) * r * 0.6]);
+  }
+  return smoothClosedPath(points);
+}
+
+const CENTER_X = 1080;
+const CENTER_Y = 230;
+const RINGS = Array.from({ length: 10 }, (_, i) => ({
+  d: contourRing(CENTER_X, CENTER_Y, 80 + i * 62, i * 0.85),
+  opacity: 0.12 - i * 0.008,
+}));
+---
+
+<div class={`topo-drift pointer-events-none absolute inset-0 overflow-hidden ${className}`} aria-hidden="true" data-topo-bg>
+  <svg class="h-full w-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" focusable="false">
+    <g>
+      {RINGS.map((ring) => (
+        <path d={ring.d} fill="none" stroke="var(--color-ink)" stroke-width="1" opacity={ring.opacity} />
+      ))}
+    </g>
+  </svg>
+  <span class="absolute top-[64%] right-[6%] hidden font-mono text-[11px] tracking-[0.2em] text-ink/20 uppercase sm:block">
+    GRID 07-B
+  </span>
+  <span class="absolute top-[16%] right-[6%] hidden font-mono text-[11px] tracking-[0.2em] text-ink/20 uppercase sm:block">
+    SECTOR 12
+  </span>
+</div>
+
+<style>
+  .topo-drift {
+    transform-origin: center;
+    animation: topo-drift 90s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  @keyframes topo-drift {
+    from {
+      transform: translate(0, 0) scale(1);
+    }
+    to {
+      transform: translate(-1.5%, 1%) scale(1.02);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .topo-drift {
+      animation: none;
+    }
+  }
+</style>
