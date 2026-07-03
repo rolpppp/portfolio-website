@@ -37,71 +37,32 @@ function bearingEast(bearing: string): number {
 
 // TODO(Rolf): the `years` ranges are drawn from the resume timeline
 // (DOST-SEI Scholar since 2023) but are estimates — verify each before
-// shipping. Media images are Unsplash placeholders; swap in real photos
-// or short videos from each milestone when you have them.
+// shipping. Checkpoints ship without media until real photos exist
+// (design-review.md §D) — re-add `media` entries one at a time as you
+// capture them; the layout already handles both states.
 const CHECKPOINTS: Checkpoint[] = [
   {
     index: "01",
     tag: "FOUNDATION",
     bearing: "N 22° E",
-    years: "2022–2023",
-    title: "Programming Foundations",
-    lead: "Wrote first working programs; learned problem decomposition, debugging, and core language fluency.",
+    years: "2022–2024",
+    title: "Foundations",
+    lead: "Learned to program, then to reason about programs — algorithms, data structures, and relational database design behind real project databases.",
     detail:
-      "Where the route begins: learning to think in code before thinking in frameworks. Fluency across languages, and the habit of decomposing a messy problem into something a machine can follow.",
-    media: {
-      src: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80&auto=format&fit=crop",
-      alt: "Code editor with early programming exercises on screen",
-      caption: "FIG. 01 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
-    },
+      "Where the route begins: problem decomposition, fluency across languages, complexity analysis, and schema design. The groundwork that later made graph-coloring research and production database work possible.",
   },
   {
     index: "02",
-    tag: "THEORY",
-    bearing: "N 41° W",
-    years: "2023",
-    title: "Algorithms & Data Structures",
-    lead: "Implemented core data structures and algorithms from scratch; learned to reason in time/space complexity.",
-    detail:
-      "The terrain gets technical. Understanding why one approach costs more than another, and how the right structure turns an intractable problem into a tractable one — the groundwork that later made graph-coloring research possible.",
-    media: {
-      src: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&q=80&auto=format&fit=crop",
-      alt: "Whiteboard covered in graph and algorithm sketches",
-      caption: "FIG. 02 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
-    },
-  },
-  {
-    index: "03",
-    tag: "DATA",
-    bearing: "N 33° E",
-    years: "2023–2024",
-    title: "Database Systems",
-    lead: "Designed and normalized relational schemas; wrote and tuned the SQL behind real project databases.",
-    detail:
-      "Relational design, normalization, and query performance. Learning that most software problems are really data problems wearing a costume.",
-    media: {
-      src: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&q=80&auto=format&fit=crop",
-      alt: "Database schema diagrams in a notebook",
-      caption: "FIG. 03 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
-    },
-  },
-  {
-    index: "04",
     tag: "DISCOVERY",
-    bearing: "N 58° W",
+    bearing: "N 41° W",
     years: "2024",
     title: "Research",
     lead: "DOST-SEI Scholar; conducted graph-coloring research — hypothesis, experiment, honest measurement.",
     detail:
-      "A DOST-SEI scholarship and graph-coloring research reframed building as a scientific act: form a hypothesis, test it, measure honestly, and let the result — not the ego — decide what ships.",
-    media: {
-      src: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80&auto=format&fit=crop",
-      alt: "Research materials and glassware on a lab bench",
-      caption: "FIG. 04 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
-    },
+      "A DOST-SEI scholarship and graph-coloring research reframed building as a scientific act: form a hypothesis, test it, measure honestly, and let the measured result decide what ships.",
   },
   {
-    index: "05",
+    index: "03",
     tag: "VELOCITY",
     bearing: "N 27° E",
     years: "2024–2025",
@@ -109,76 +70,41 @@ const CHECKPOINTS: Checkpoint[] = [
     lead: "Top-5 regional finish, then Honorable Mention (top 6 of 70+ teams) at the international APRU Tech Policy Hackathon 2025.",
     detail:
       "Compressing the whole arc — idea to demo — into a weekend. A Top-5 finish at the Regional Smart Communities Exposition, then an Honorable Mention at the APRU Tech Policy Hackathon 2025 in Google Bangkok — top 6 among 70+ teams from across Southeast Asia. Both taught more about scope, teamwork, and shipping than any amount of unhurried planning could.",
-    media: {
-      src: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80&auto=format&fit=crop",
-      alt: "Team working on laptops during a hackathon",
-      caption: "FIG. 05 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
-    },
   },
   {
-    index: "06",
+    index: "04",
     tag: "VENTURE",
     bearing: "N 47° W",
     years: "2025",
     title: "Startup Building",
     lead: "Validating startup concepts with real users — problem interviews and prototypes before code.",
     detail:
-      "The Startup Lab: treating ideas as hypotheses about people, validating with real users before writing much code, and learning that the hardest engineering is often deciding what not to build.",
-    media: {
-      src: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80&auto=format&fit=crop",
-      alt: "Sticky notes and product planning on a whiteboard",
-      caption: "FIG. 06 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
-    },
+      "Treating ideas as hypotheses about people: problem interviews and prototypes with real users before committing to code, and learning that the hardest engineering is often deciding what not to build.",
   },
   {
-    index: "07",
+    index: "05",
     tag: "CRAFT",
     bearing: "N 38° E",
     years: "2025–2026",
     title: "Software Engineering",
-    lead: "Shipped production systems (Lab IMS, AIGRI) — maintainable code, reviews, team collaboration.",
+    lead: "Shipped production systems (Lab IMS, AiGRI) — maintainable code, reviews, and cloud deployment.",
     detail:
-      "Beyond making it work — making it maintainable, reviewable, and collaborative. Real projects (IMS, AIGRI) where the code has to outlive the moment it was written.",
-    media: {
-      src: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80&auto=format&fit=crop",
-      alt: "Production code under review on a monitor",
-      caption: "FIG. 07 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
-    },
+      "Beyond making it work — making it maintainable, reviewable, and collaborative. Real projects (Lab IMS, AiGRI, BiteSpot on AWS) where the code has to outlive the moment it was written, and where deployment, cost, and reliability become engineering decisions too.",
   },
   {
-    index: "08",
-    tag: "SCALE",
-    bearing: "N 52° W",
-    years: "2026",
-    title: "Cloud Computing",
-    lead: "Deploying to cloud infrastructure; learning the cost, reliability, and operations trade-offs of scale.",
-    detail:
-      "Infrastructure, deployment, and the economics of running software at scale. The current frontier — where an engineering decision becomes an operational one.",
-    media: {
-      src: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80&auto=format&fit=crop",
-      alt: "Rows of servers in a data-center aisle",
-      caption: "FIG. 08 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
-    },
-  },
-  {
-    index: "09",
+    index: "06",
     tag: "FIELD WORK",
-    bearing: "N 44° E",
+    bearing: "N 52° W",
     years: "2026",
     title: "Internship — MYT SoftDev Solutions",
     lead: "Production engineering at MYT SoftDev Solutions Inc. (Cebu City) — ERP performance work and a ticketing notification system for paying clients.",
     detail:
-      "First professional deployment: inside MYT SoftDev Solutions' live codebases in Cebu City — profiling and optimizing two client ERP systems (~40% faster loads on the heaviest modules) and closing the notification loop in a support ticketing system. Full field reports: Expeditions 03 & 04.",
-    media: {
-      src: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80&auto=format&fit=crop",
-      alt: "Software development office workspace",
-      caption: "FIG. 09 · PLACEHOLDER — SWAP FOR A REAL PHOTO",
-    },
+      "First professional deployment: inside MYT SoftDev Solutions' live codebases in Cebu City — profiling and optimizing two client ERP systems (~40% faster loads on the heaviest modules) and closing the notification loop in a support ticketing system. Full field reports in Featured Expeditions: Production ERP Systems and the Support Ticketing System.",
   },
   {
-    index: "10",
+    index: "07",
     tag: "HORIZON",
-    bearing: "N 30° W",
+    bearing: "N 30° E",
     years: "2026 →",
     title: "Future Expeditions",
     lead: "Open to engineering roles and collaboration — harder problems, new domains, real impact.",
@@ -244,7 +170,7 @@ const CONTOURS = Array.from({ length: 8 }, (_, i) => {
         preserveAspectRatio="none"
       >
         <path data-route-base fill="none" stroke="var(--color-paper)" stroke-width="1.5" stroke-dasharray="2 6" stroke-linecap="round" opacity="0.18"></path>
-        <path data-route-draw fill="none" stroke="#6FA0C7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+        <path data-route-draw fill="none" stroke="var(--color-route)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
       </svg>
 
       {positioned.map((cp) => (
@@ -266,7 +192,7 @@ const CONTOURS = Array.from({ length: 8 }, (_, i) => {
             <summary class="flex cursor-pointer list-none items-start justify-between gap-6 pt-0.5 [&::-webkit-details-marker]:hidden">
               <div>
                 <p class="font-mono text-[11px] tracking-[0.2em] text-paper/60 uppercase">
-                  {cp.index} · {cp.tag} · {cp.bearing} · {cp.years}
+                  {cp.index} · {cp.tag} · {cp.years}
                 </p>
                 <h3 class="mt-2 font-display text-2xl font-light tracking-tight text-paper md:text-3xl">
                   {cp.title}
@@ -323,8 +249,9 @@ const CONTOURS = Array.from({ length: 8 }, (_, i) => {
     ? Array.from(section.querySelectorAll<HTMLElement>("[data-checkpoint]"))
     : [];
 
-  // Journey-only route accent (lightened Ocean Blue — WCAG-safe on Deep Forest).
-  const ROUTE = "#6FA0C7";
+  // Route accent token — lightened ocean on the dark ground in light mode,
+  // deep ocean on the inverted ivory ground in dark mode (global.css).
+  const ROUTE = "var(--color-route)";
 
   if (section && svg && basePath && drawPath && nodes.length > 1) {
     const reduce = prefersReducedMotion();
@@ -454,9 +381,13 @@ const CONTOURS = Array.from({ length: 8 }, (_, i) => {
 
       setupDraw();
 
-      // Soft fade-up for each checkpoint — quiet, one-time, never competing
-      // with the route draw.
-      gsap.utils.toArray<HTMLElement>("[data-checkpoint]").forEach((el) => {
+      // Soft fade-up for each checkpoint's text content — quiet, one-time,
+      // never competing with the route draw. Deliberately targets the
+      // <details>, NOT the <li>: the li contains the waypoint pin the route
+      // is measured from, and animating it poisons buildPath's measurements
+      // with the transient y-offset (path endpoints land ~24px off their
+      // pins until something else forces a rebuild).
+      gsap.utils.toArray<HTMLElement>("[data-checkpoint] details").forEach((el) => {
         gsap.from(el, {
           y: 24,
           opacity: 0,
@@ -481,6 +412,11 @@ const CONTOURS = Array.from({ length: 8 }, (_, i) => {
         });
       };
       if (list) new ResizeObserver(rebuild).observe(list);
+      // First visit loads webfonts after this script runs; the swap reflows
+      // text and moves the pins. The ResizeObserver usually catches it, but
+      // rebuild explicitly once fonts settle in case only glyph metrics
+      // (not the list's height) changed.
+      document.fonts?.ready.then(rebuild);
     }
   }
 </script>

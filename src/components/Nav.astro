@@ -1,12 +1,17 @@
 ---
+import { getCollection } from "astro:content";
 import MobileNav from "../islands/MobileNav";
+
+// Writing only appears in the nav once at least one piece is published —
+// Journal.astro drops the #writing block (and its anchor) until then.
+const hasWriting = (await getCollection("writing")).some((p) => !p.data.draft);
 
 const LINKS = [
   { label: "Home", href: "#home" },
   { label: "Journey", href: "#journey" },
   { label: "Projects", href: "#projects" },
   { label: "Research", href: "#research" },
-  { label: "Writing", href: "#writing" },
+  ...(hasWriting ? [{ label: "Writing", href: "#writing" }] : []),
   { label: "Toolkit", href: "#toolkit" },
   { label: "Contact", href: "#contact" },
 ];
@@ -18,25 +23,93 @@ const LINKS = [
     data-nav-inner
   >
     <a href="#home" class="font-display text-lg tracking-tight text-ink">RG</a>
-    <ul class="hidden items-center gap-8 font-mono text-[11px] tracking-[0.16em] text-ink/70 uppercase lg:flex">
+    <ul class="relative hidden items-center gap-8 font-mono text-[11px] tracking-[0.16em] text-ink/70 uppercase lg:flex">
       {LINKS.map((link) => (
         <li>
-          <a href={link.href} class="transition-colors hover:text-ocean">
+          <a href={link.href} data-nav-link class="nav-link transition-colors hover:text-ocean">
             {link.label}
           </a>
         </li>
       ))}
+      <li data-nav-marker class="nav-marker" aria-hidden="true"></li>
     </ul>
-    <a
-      href="#contact"
-      class="hidden font-mono text-[11px] tracking-[0.16em] text-ocean uppercase transition-colors hover:text-ink lg:inline-block"
-    >
-      Get in touch
-    </a>
+    <div class="flex items-center gap-4">
+      <button
+        type="button"
+        data-theme-toggle
+        aria-label="Switch to dark mode"
+        class="-m-1.5 p-1.5 text-ink/70 transition-colors hover:text-ocean"
+      >
+        {/* Moon shows in light mode (the mode you'd switch to), sun in dark. */}
+        <svg
+          viewBox="0 0 24 24"
+          class="block h-[18px] w-[18px] dark:hidden"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M20.4 13.2A8 8 0 1 1 10.8 3.6a6.5 6.5 0 0 0 9.6 9.6z" />
+        </svg>
+        <svg
+          viewBox="0 0 24 24"
+          class="hidden h-[18px] w-[18px] dark:block"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="12" cy="12" r="4" />
+          <line x1="12" y1="2.5" x2="12" y2="5" /><line x1="12" y1="19" x2="12" y2="21.5" />
+          <line x1="2.5" y1="12" x2="5" y2="12" /><line x1="19" y1="12" x2="21.5" y2="12" />
+          <line x1="5.3" y1="5.3" x2="7" y2="7" /><line x1="17" y1="17" x2="18.7" y2="18.7" />
+          <line x1="18.7" y1="5.3" x2="17" y2="7" /><line x1="7" y1="17" x2="5.3" y2="18.7" />
+        </svg>
+      </button>
 
-    <MobileNav links={LINKS} client:visible />
+      <a
+        href="#contact"
+        class="hidden font-mono text-[11px] tracking-[0.16em] text-ocean uppercase transition-colors hover:text-ink lg:inline-block"
+      >
+        Get in touch
+      </a>
+
+      <MobileNav links={LINKS} client:visible />
+    </div>
   </nav>
 </header>
+
+<style>
+  /* "You are here" marker — the link for the section in view gets full-
+     strength ink, and one shared gold hairline slides under it. A single
+     element animating left/width (instead of a per-link ::after popping in)
+     is what makes the move between sections read as one continuous motion. */
+  .nav-link[aria-current="true"] {
+    color: var(--color-ink);
+  }
+  .nav-marker {
+    position: absolute;
+    bottom: -0.45rem;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--color-gold);
+    opacity: 0;
+    transition:
+      left 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.2s ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-marker {
+      transition: none;
+    }
+  }
+</style>
 
 <script>
   const nav = document.querySelector<HTMLElement>("[data-nav-inner]");
@@ -52,4 +125,94 @@ const LINKS = [
 
   updateNavState();
   window.addEventListener("scroll", updateNavState, { passive: true });
+
+  // Theme toggle. The pre-paint script in Layout.astro owns initial state;
+  // this just flips it. Storing only choices that differ from the system
+  // preference means "back in sync with the system" resumes following it.
+  const themeToggle = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+  const setToggleLabel = () => {
+    themeToggle?.setAttribute(
+      "aria-label",
+      document.documentElement.dataset.theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+    );
+  };
+  setToggleLabel();
+  themeToggle?.addEventListener("click", () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    const system = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    try {
+      if (next === system) localStorage.removeItem("theme");
+      else localStorage.setItem("theme", next);
+    } catch {}
+    setToggleLabel();
+  });
+
+  // Active-section indicator: whichever linked section currently crosses the
+  // middle band of the viewport is "here". Plain scroll math (not
+  // IntersectionObserver) so it stays correct with Lenis-smoothed scrolling
+  // and sections taller than the viewport.
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]"));
+  const targets = links
+    .map((link) => {
+      const section = document.querySelector<HTMLElement>(link.hash);
+      return section ? { link, section } : null;
+    })
+    .filter((t): t is { link: HTMLAnchorElement; section: HTMLElement } => t !== null);
+
+  const marker = document.querySelector<HTMLElement>("[data-nav-marker]");
+  let current: HTMLAnchorElement | null = null;
+  let ticking = false;
+
+  // Slide the shared hairline to the active link. offsetLeft/offsetWidth are
+  // relative to the position:relative <ul>, so no rect math is needed.
+  function positionMarker() {
+    if (!marker) return;
+    if (!current) {
+      marker.style.opacity = "0";
+      return;
+    }
+    marker.style.opacity = "1";
+    marker.style.left = `${current.offsetLeft}px`;
+    marker.style.width = `${current.offsetWidth}px`;
+  }
+
+  function updateActiveLink() {
+    ticking = false;
+    const probe = window.innerHeight * 0.4;
+    let active: HTMLAnchorElement | null = null;
+    for (const { link, section } of targets) {
+      if (section.getBoundingClientRect().top <= probe) active = link;
+    }
+    if (active === current) return;
+    current?.removeAttribute("aria-current");
+    active?.setAttribute("aria-current", "true");
+    current = active;
+    positionMarker();
+  }
+
+  if (targets.length) {
+    updateActiveLink();
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(updateActiveLink);
+        }
+      },
+      { passive: true }
+    );
+    // Link positions shift on resize and once the mono webfont loads —
+    // re-seat the marker even when the active section hasn't changed.
+    window.addEventListener(
+      "resize",
+      () => {
+        updateActiveLink();
+        positionMarker();
+      },
+      { passive: true }
+    );
+    document.fonts?.ready.then(positionMarker);
+  }
 </script>

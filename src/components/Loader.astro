@@ -1,0 +1,72 @@
+---
+// Loading screen — a short route segment draws between two waypoints while
+// the page streams in (TO-DO motion pass: "loading screen route-segment
+// draw"). Decorative, so it is strictly budgeted:
+//   - shows once per session (sessionStorage), never on repeat navigation
+//   - skipped entirely under prefers-reduced-motion
+//   - starts `hidden` and is only revealed by the inline script, so with
+//     JavaScript disabled it never blocks the page
+// The script is is:inline and sits right after the markup: it runs during
+// parsing, before the sections below exist, so the overlay is up before any
+// content can flash.
+---
+
+<div
+  id="route-loader"
+  hidden
+  aria-hidden="true"
+  class="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-7 bg-paper"
+>
+  <svg width="220" height="64" viewBox="0 0 220 64" fill="none" aria-hidden="true" focusable="false">
+    <path
+      data-loader-path
+      d="M10 52 C 48 14, 84 58, 122 30 C 148 11, 178 26, 210 12"
+      stroke="var(--color-ocean)"
+      stroke-width="2.5"
+      stroke-linecap="round"
+    ></path>
+    <circle cx="10" cy="52" r="3.5" fill="var(--color-gold)"></circle>
+    <circle cx="210" cy="12" r="3.5" fill="none" stroke="var(--color-gold)" stroke-width="1.5"></circle>
+  </svg>
+  <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-ink/60">
+    Charting the next expedition…
+  </p>
+</div>
+
+<script is:inline>
+  (function () {
+    var el = document.getElementById("route-loader");
+    if (!el) return;
+    var seen = null;
+    try {
+      seen = sessionStorage.getItem("route-loader");
+    } catch (e) {}
+    if (seen || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.remove();
+      return;
+    }
+    try {
+      sessionStorage.setItem("route-loader", "1");
+    } catch (e) {}
+
+    el.hidden = false;
+    document.documentElement.style.overflow = "hidden";
+
+    var path = el.querySelector("[data-loader-path]");
+    var len = path.getTotalLength();
+    path.style.strokeDasharray = String(len);
+    path.style.strokeDashoffset = String(len);
+    path.getBoundingClientRect(); // flush so the draw transitions from 0
+    path.style.transition = "stroke-dashoffset 0.9s cubic-bezier(0.4, 0, 0.2, 1)";
+    path.style.strokeDashoffset = "0";
+
+    setTimeout(function () {
+      el.style.transition = "opacity 0.35s ease";
+      el.style.opacity = "0";
+      setTimeout(function () {
+        el.remove();
+        document.documentElement.style.overflow = "";
+      }, 380);
+    }, 1150);
+  })();
+</script>

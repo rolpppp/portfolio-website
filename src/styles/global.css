@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Drive Tailwind's dark: variant from the data-theme attribute (set by the
+   pre-paint script in Layout.astro) instead of the raw media query, so the
+   nav toggle's explicit choice wins over the system preference. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   /* Cartographic design system — color */
   --color-paper: #f5f3ee;
@@ -9,11 +14,38 @@
   --color-ocean-large: #3a78b8;
   --color-gold: #c59d5f;
   --color-moss: #5e8b52;
+  /* Error state only (contact form) — never a brand accent. */
+  --color-rust: #8f3b2d;
+  /* Accent for the ink-ground chapters (Journey/Journal): ocean lightened to
+     clear WCAG on the dark ground. In dark mode those chapters invert to
+     ivory, so route flips to the deep ocean value below. */
+  --color-route: #6fa0c7;
 
   /* Typography */
   --font-display: "Fraunces", serif;
   --font-sans: "IBM Plex Sans", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
+}
+
+/* Dark theme — a token swap, not a redesign. paper/ink invert (so the dark
+   Journey/Journal chapters become the light chapters, preserving the
+   alternating rhythm and every contrast pairing); accents re-tuned for the
+   dark ground. `data-theme` is stamped on <html> by the inline script in
+   Layout.astro before first paint: system preference by default, overridden
+   by the nav toggle (persisted in localStorage). */
+:root {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: #0c1f15;
+  --color-paper-alt: #14291c;
+  --color-ink: #e9e6dd;
+  --color-ocean: #6fa0c7;
+  --color-ocean-large: #7fb0d6;
+  --color-moss: #6f9c63;
+  --color-rust: #c97a63;
+  --color-route: #2e5f94;
 }
 
 @layer base {
@@ -24,5 +56,21 @@
 
   body {
     font-family: var(--font-sans);
+  }
+
+  /* Site-wide reduced-motion kill switch. The GSAP/Lenis work is already
+     gated in JS (lib/motion.ts); this catches every CSS transition and
+     animation — disclosure `+` rotations, hover arrow slides, the nav
+     hamburger — so no motion escapes the preference. Color-only transitions
+     are collapsed too, which is an acceptable trade for a complete gate. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
