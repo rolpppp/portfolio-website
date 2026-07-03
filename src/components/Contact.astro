@@ -22,7 +22,7 @@ const FORM_ENDPOINT = `https://formspree.io/f/${FORM_ID}`;
     <div class="grid gap-16 lg:grid-cols-12 lg:gap-12">
       <div class="lg:col-span-7">
         <p class="font-mono text-xs uppercase tracking-[0.25em] text-ink/70">
-          Next Expedition · Open
+          Open to Opportunities
         </p>
         <h2 class="mt-6 max-w-2xl font-display text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.95] font-light tracking-tight text-ink">
           Ready to build something meaningful?
@@ -62,11 +62,15 @@ const FORM_ENDPOINT = `https://formspree.io/f/${FORM_ID}`;
           class="rounded-sm border border-ink/10 bg-paper-alt/50 p-6 md:p-8"
         >
           <p class="font-mono text-[11px] tracking-[0.2em] text-ink/60 uppercase">
-            Send a signal
+            Direct message
           </p>
 
           <div data-fs-success role="status" aria-live="polite" class="mt-4 empty:hidden font-sans text-sm leading-relaxed text-ink"></div>
-          <div data-fs-error aria-live="polite" class="mt-4 empty:hidden font-sans text-sm leading-relaxed text-ocean"></div>
+          <div
+            data-fs-error
+            aria-live="polite"
+            class="mt-4 empty:hidden font-sans text-sm leading-relaxed text-rust before:mr-1 before:font-mono before:text-xs before:tracking-[0.16em] before:text-ink before:content-['ERR_—']"
+          ></div>
 
           <div class="mt-6 space-y-5">
             <div>
@@ -78,10 +82,10 @@ const FORM_ENDPOINT = `https://formspree.io/f/${FORM_ID}`;
                 required
                 autocomplete="name"
                 data-fs-field
-                class="mt-2 w-full rounded-sm border border-ink/20 bg-paper px-3.5 py-2.5 font-sans text-sm text-ink placeholder:text-ink/35 focus:border-ocean focus:outline focus:outline-1 focus:outline-ocean aria-[invalid=true]:border-ocean"
+                class="mt-2 w-full rounded-sm border border-ink/20 bg-paper px-3.5 py-2.5 font-sans text-sm text-ink placeholder:text-ink/35 focus:border-ocean focus:outline focus:outline-1 focus:outline-ocean aria-[invalid=true]:border-rust"
                 placeholder="Your name"
               />
-              <span data-fs-error="name" class="mt-1.5 block empty:hidden font-sans text-xs text-ocean"></span>
+              <span data-fs-error="name" class="mt-1.5 block empty:hidden font-sans text-xs text-rust"></span>
             </div>
             <div>
               <label for="contact-email" class="block font-sans text-sm font-medium text-ink">Email</label>
@@ -92,10 +96,10 @@ const FORM_ENDPOINT = `https://formspree.io/f/${FORM_ID}`;
                 required
                 autocomplete="email"
                 data-fs-field
-                class="mt-2 w-full rounded-sm border border-ink/20 bg-paper px-3.5 py-2.5 font-sans text-sm text-ink placeholder:text-ink/35 focus:border-ocean focus:outline focus:outline-1 focus:outline-ocean aria-[invalid=true]:border-ocean"
+                class="mt-2 w-full rounded-sm border border-ink/20 bg-paper px-3.5 py-2.5 font-sans text-sm text-ink placeholder:text-ink/35 focus:border-ocean focus:outline focus:outline-1 focus:outline-ocean aria-[invalid=true]:border-rust"
                 placeholder="you@company.com"
               />
-              <span data-fs-error="email" class="mt-1.5 block empty:hidden font-sans text-xs text-ocean"></span>
+              <span data-fs-error="email" class="mt-1.5 block empty:hidden font-sans text-xs text-rust"></span>
             </div>
             <div>
               <label for="contact-message" class="block font-sans text-sm font-medium text-ink">Message</label>
@@ -105,9 +109,9 @@ const FORM_ENDPOINT = `https://formspree.io/f/${FORM_ID}`;
                 required
                 rows="5"
                 data-fs-field
-                class="mt-2 w-full resize-y rounded-sm border border-ink/20 bg-paper px-3.5 py-2.5 font-sans text-sm text-ink placeholder:text-ink/35 focus:border-ocean focus:outline focus:outline-1 focus:outline-ocean aria-[invalid=true]:border-ocean"
+                class="mt-2 w-full resize-y rounded-sm border border-ink/20 bg-paper px-3.5 py-2.5 font-sans text-sm text-ink placeholder:text-ink/35 focus:border-ocean focus:outline focus:outline-1 focus:outline-ocean aria-[invalid=true]:border-rust"
                 placeholder="What are we building?"></textarea>
-              <span data-fs-error="message" class="mt-1.5 block empty:hidden font-sans text-xs text-ocean"></span>
+              <span data-fs-error="message" class="mt-1.5 block empty:hidden font-sans text-xs text-rust"></span>
             </div>
           </div>
 
@@ -132,11 +136,38 @@ const FORM_ENDPOINT = `https://formspree.io/f/${FORM_ID}`;
         Still exploring.
       </p>
       <p class="font-mono text-[11px] tracking-[0.2em] text-ink/40 uppercase">
-        11.2543°N · 125.0000°E — Tacloban City
+        10.3725°N · 124.7488°E — Hilongos, Leyte
       </p>
     </div>
   </footer>
 </section>
+
+<style>
+  /* @formspree/ajax injects Bootstrap-toned alert styles at runtime
+     (#dc3545 red, pink/green alert boxes) that out-specify the utility
+     classes. Re-scope its active states to the design system: rust errors,
+     ink success, no alert boxes. The #contact-form id keeps these rules
+     above Formspree's [attr][attr] selectors. */
+  #contact-form [data-fs-error][data-fs-active] {
+    color: var(--color-rust);
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin-bottom: 0;
+    border-radius: 0;
+  }
+  #contact-form [data-fs-success][data-fs-active] {
+    color: var(--color-ink);
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin-bottom: 0;
+    border-radius: 0;
+  }
+  #contact-form [data-fs-field][aria-invalid="true"] {
+    border-color: var(--color-rust);
+  }
+</style>
 
 <script>
   import { initForm } from "@formspree/ajax";

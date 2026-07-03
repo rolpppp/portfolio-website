@@ -1,22 +1,36 @@
 ---
 // Research & Innovation — field-notebook / scientific-poster identity
-// (design-brief.md §4). Warm Ivory surface with a faint graph-paper grid;
-// each research area is a catalogued figure card: line-drawn diagram, mono
-// labels, and cross-references to the numbered Featured Expeditions. The only
-// "data" shown is real data (status, refs) — no decorative fake charts.
-// Weighted equal to Featured Expeditions: same header scale, same rhythm.
+// (design-brief.md §4). An ink-ground chapter (like Journey/Journal) so the
+// page strictly alternates grounds — per Rolf 2026-07-03 it must be the
+// inverse of the paper sections around it in both themes. Faint graph-paper
+// grid; each research area is a catalogued figure card: line-drawn diagram,
+// mono labels, and cross-references to Featured Expeditions by title. The
+// only "data" shown is real data (status, refs) — no decorative fake charts.
 import { getCollection } from "astro:content";
 
 const areas = (await getCollection("research")).sort(
   (a, b) => a.data.order - b.data.order
 );
 
-// Status marks: dot color is graphical info (≥3:1 on ivory), label is ink.
+// Status marks: dot color is graphical info on the ink ground, label text
+// carries the meaning. Exploring uses the route token (ocean is too dark on
+// ink; route flips with the theme like the ground does).
 const STATUS_DOT: Record<string, string> = {
   Active: "bg-moss",
   Ongoing: "bg-gold",
-  Exploring: "bg-ocean",
+  Exploring: "bg-route",
 };
+
+// Legend glosses for the dots. Only statuses actually in use render, so the
+// legend never explains a color that isn't on the page.
+const STATUS_GLOSS: Record<string, string> = {
+  Active: "current focus",
+  Ongoing: "continuing work",
+  Exploring: "early study",
+};
+const usedStatuses = Object.keys(STATUS_DOT).filter((s) =>
+  areas.some((a) => a.data.status === s)
+);
 
 // Line-drawn notebook figures, one per research area. Stroke inherits the
 // card's ink tone; the single gold mark per figure is the system's rare
@@ -72,31 +86,42 @@ const FIGURES: Record<string, string> = {
 };
 ---
 
-<section id="research" class="notebook-grid relative bg-paper-alt px-6 py-32 md:px-12 md:py-40 lg:px-20">
+<section id="research" class="notebook-grid relative bg-ink px-6 py-32 text-paper md:px-12 md:py-40 lg:px-20">
   <div class="mx-auto max-w-6xl">
     <header class="max-w-2xl">
-      <p class="font-mono text-xs uppercase tracking-[0.25em] text-ink/70">
-        Field Notes · {String(areas.length).padStart(2, "0")} Research Areas
+      <p class="font-mono text-xs uppercase tracking-[0.25em] text-paper/70">
+        Field Notes
       </p>
-      <h2 class="mt-6 font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.95] font-light tracking-tight text-ink">
+      <h2 class="mt-6 font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.95] font-light tracking-tight text-paper">
         Research &amp; Innovation
       </h2>
-      <p class="mt-8 max-w-xl font-sans text-base leading-relaxed text-ink/80 md:text-lg">
-        Discovery is half the expedition. These are the areas under active
-        study — each one feeding directly back into something built.
+      <p class="mt-8 max-w-xl font-sans text-base leading-relaxed text-paper/80 md:text-lg">
+        The areas I'm studying right now. Each one feeds directly into at
+        least one of the projects above.
       </p>
+      <ul
+        class="mt-8 flex flex-wrap gap-x-6 gap-y-2 font-mono text-[10px] tracking-[0.16em] text-paper/60 uppercase"
+        aria-label="Status legend"
+      >
+        {usedStatuses.map((status) => (
+          <li class="flex items-center gap-2">
+            <span class={`inline-block h-2 w-2 rounded-full ${STATUS_DOT[status]}`} aria-hidden="true"></span>
+            {status} — {STATUS_GLOSS[status]}
+          </li>
+        ))}
+      </ul>
     </header>
 
     <div class="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
       {areas.map((area, i) => (
         <article
           data-research-card
-          class={`flex flex-col rounded-sm border border-ink/10 bg-paper p-6 transition-colors hover:border-ink/30 md:p-7 ${i === 0 ? "md:col-span-2 lg:col-span-3 lg:flex-row lg:items-center lg:gap-12" : ""}`}
+          class={`flex flex-col rounded-sm border border-paper/15 bg-paper/5 p-6 transition-colors hover:border-paper/35 md:p-7 ${i === 0 ? "md:col-span-2 lg:col-span-3 lg:flex-row lg:items-center lg:gap-12" : ""}`}
         >
           <div class={i === 0 ? "lg:order-2 lg:w-72 lg:shrink-0" : ""}>
             <svg
               viewBox="0 0 120 72"
-              class="h-24 w-full text-ink/50"
+              class="h-24 w-full text-paper/60"
               fill="none"
               stroke="currentColor"
               stroke-width="1.5"
@@ -105,30 +130,30 @@ const FIGURES: Record<string, string> = {
               focusable="false"
               set:html={FIGURES[area.data.figure]}
             />
-            <p class="mt-2 text-center font-mono text-[10px] tracking-[0.2em] text-ink/40 uppercase">
+            <p class="mt-2 text-center font-mono text-[10px] tracking-[0.2em] text-paper/45 uppercase">
               FIG. R-{String(i + 1).padStart(2, "0")}
             </p>
           </div>
 
           <div class={`mt-5 flex flex-1 flex-col ${i === 0 ? "lg:order-1 lg:mt-0" : ""}`}>
             <div class="flex items-baseline justify-between gap-4">
-              <p class="font-mono text-[11px] tracking-[0.2em] text-ink/60 uppercase">
+              <p class="font-mono text-[11px] tracking-[0.2em] text-paper/60 uppercase">
                 R-{String(i + 1).padStart(2, "0")}
               </p>
-              <p class="flex items-center gap-2 font-mono text-[10px] tracking-[0.16em] text-ink/60 uppercase">
+              <p class="flex items-center gap-2 font-mono text-[10px] tracking-[0.16em] text-paper/70 uppercase">
                 <span class={`inline-block h-2 w-2 rounded-full ${STATUS_DOT[area.data.status]}`} aria-hidden="true"></span>
                 {area.data.status}
               </p>
             </div>
-            <h3 class="mt-3 font-display text-2xl font-light tracking-tight text-ink md:text-[1.65rem]">
+            <h3 class="mt-3 font-display text-2xl font-light tracking-tight text-paper md:text-[1.65rem]">
               {area.data.title}
             </h3>
-            <p class="mt-3 flex-1 font-sans text-sm leading-relaxed text-ink/70">
+            <p class="mt-3 flex-1 font-sans text-sm leading-relaxed text-paper/70">
               {area.data.description}
             </p>
-            <ul class="mt-5 flex flex-wrap gap-x-5 gap-y-1.5 border-t border-ink/10 pt-4" aria-label="Related work">
+            <ul class="mt-5 flex flex-wrap gap-x-5 gap-y-1.5 border-t border-paper/15 pt-4" aria-label="Related work">
               {area.data.refs.map((ref) => (
-                <li class="font-mono text-[10px] tracking-[0.14em] text-ocean uppercase">
+                <li class="font-mono text-[10px] tracking-[0.14em] text-route uppercase">
                   {ref}
                 </li>
               ))}
@@ -145,8 +170,8 @@ const FIGURES: Record<string, string> = {
      near-background contrast so it reads as texture, not decoration. */
   .notebook-grid {
     background-image:
-      linear-gradient(to right, rgba(18, 53, 36, 0.045) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(18, 53, 36, 0.045) 1px, transparent 1px);
+      linear-gradient(to right, color-mix(in srgb, var(--color-paper) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--color-paper) 6%, transparent) 1px, transparent 1px);
     background-size: 28px 28px;
   }
 </style>

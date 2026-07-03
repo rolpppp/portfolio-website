@@ -1,19 +1,81 @@
 ---
-// Engineering Toolkit — technologies clustered into ecosystems
-// (design-brief.md §6). No progress bars, no skill percentages, no scored
-// list: quiet tag clusters in the mono data voice. The only number shown is
-// the honest one — how many instruments are in each cluster.
+// Engineering Toolkit — the proof-wired field kit. No progress bars, no
+// skill percentages, no scored list: every claim in this section is wired to
+// evidence computed at build time from the expeditions' real `stack`
+// frontmatter (plus this site itself, which is also shipped work).
 //
-// Fixed roster, so it lives here rather than in a content collection
-// (collections are for expeditions / research / writing per CLAUDE.md).
+//   - "Primary instruments" — a curated featured row (curated so the
+//     internship's PHP volume doesn't drown the research identity), but each
+//     card's FIELD USE line is derived, never hand-typed.
+//   - "Full field kit" — the ecosystem inventory as hairline spec rows, tags
+//     in one plain mono line (no chip wall), with a computed FIELD USE
+//     cross-ref wherever the cluster's tools actually shipped.
+import { getCollection } from "astro:content";
+
+const expeditions = (await getCollection("expeditions")).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+// Evidence sources: the seven shipped expeditions + this site.
+const SOURCES: { title: string; stack: string[] }[] = [
+  ...expeditions.map((e) => ({ title: e.data.title, stack: e.data.stack })),
+  { title: "This Site", stack: ["Astro", "React", "Tailwind CSS", "GSAP", "JavaScript"] },
+];
+
+// Canonical tool names so cluster tags and stack entries match honestly:
+// "CodeIgniter 3 & 4" ≡ "CodeIgniter 4", "Vanilla JS" ≡ "JavaScript", and
+// the generic "SQL" tag matches any shipped SQL database. Everything else is
+// exact (lowercased) — substring matching would let "Java" claim JavaScript.
+function canon(name: string): string {
+  const n = name.toLowerCase();
+  if (n.startsWith("codeigniter")) return "codeigniter";
+  if (n === "vanilla js") return "javascript";
+  return n;
+}
+const SQL_ENGINES = new Set(["mysql", "postgresql", "sqlite"]);
+
+function carriedBy(tool: string): string[] {
+  const c = canon(tool);
+  return SOURCES.filter((s) =>
+    s.stack.some((t) => {
+      const ct = canon(t);
+      return ct === c || (c === "sql" && SQL_ENGINES.has(ct));
+    })
+  ).map((s) => s.title);
+}
+
+// Featured row — tools a recruiter should see first, each with the work it
+// actually shipped in. Selection is editorial; evidence is computed.
+const PRIMARY = [
+  { tool: "Python", role: "Computer-vision pipelines and model training", glyph: "terminal" },
+  { tool: "PHP", role: "Production ERP and client systems at scale", glyph: "brackets" },
+  { tool: "MySQL", role: "The workhorse database behind four shipped systems", glyph: "cylinder" },
+  { tool: "PostgreSQL", role: "Relational backbone for the data-heavy apps", glyph: "table" },
+  { tool: "Flutter", role: "Cross-platform mobile with offline-first storage", glyph: "phone" },
+  { tool: "JavaScript", role: "Interfaces from vanilla DOM to React islands", glyph: "braces" },
+].map((p) => ({ ...p, use: carriedBy(p.tool) }));
+
+// Catalog marks for the featured cards — abstract domain glyphs (never brand
+// logos) in the same 1.5px line-drawn language as the Research FIGs and the
+// compass above. Monochrome only: the compass pivot keeps the section's one
+// gold mark.
+const GLYPHS: Record<string, string> = {
+  terminal: `<path d="M5 7l5 5-5 5"/><line x1="12" y1="17" x2="19" y2="17"/>`,
+  brackets: `<path d="M8 6l-5 6 5 6"/><path d="M16 6l5 6-5 6"/>`,
+  cylinder: `<ellipse cx="12" cy="6" rx="7" ry="2.6"/><path d="M5 6v12"/><path d="M19 6v12"/><path d="M5 12c0 1.44 3.13 2.6 7 2.6s7-1.16 7-2.6"/><path d="M5 18c0 1.44 3.13 2.6 7 2.6s7-1.16 7-2.6"/>`,
+  table: `<rect x="4" y="5" width="16" height="14" rx="1"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="10" y1="10" x2="10" y2="19"/>`,
+  phone: `<rect x="7" y="3" width="10" height="18" rx="2"/><line x1="10.5" y1="17.5" x2="13.5" y2="17.5"/>`,
+  braces: `<path d="M9 4c-2 0-3 1-3 3v2c0 1.5-1 2-2 2 1 0 2 .5 2 2v2c0 2 1 3 3 3"/><path d="M15 4c2 0 3 1 3 3v2c0 1.5 1 2 2 2-1 0-2 .5-2 2v2c0 2-1 3-3 3"/>`,
+};
 
 interface Cluster {
   name: string;
   tags: string[];
+  // Honest manual credit where stacks can't express it (e.g. AiGRI's
+  // ResNet-50 transfer learning is the AI cluster's field use).
+  extraUse?: string[];
 }
 
-// Tags drawn from the resume and the shipped expeditions. Frameworks is a
-// deliberate roll-up index of what appears in the domain clusters.
 const CLUSTERS: Cluster[] = [
   {
     name: "Languages",
@@ -30,10 +92,11 @@ const CLUSTERS: Cluster[] = [
   {
     name: "AI",
     tags: ["TensorFlow", "PyTorch", "Pandas", "NumPy", "Transfer Learning"],
+    extraUse: ["Project AiGRI"],
   },
   {
     name: "Computer Vision",
-    tags: ["OpenCV", "ResNet-50", "Image Classification", "Drone Imagery Analysis"],
+    tags: ["OpenCV", "ResNet-50", "Image Classification", "Drone Imagery Pipelines", "Geospatial Data Handling"],
   },
   {
     name: "Databases",
@@ -48,90 +111,138 @@ const CLUSTERS: Cluster[] = [
     tags: ["Flutter", "Dart", "Offline-first Storage"],
   },
   {
-    name: "GIS",
-    tags: ["Drone Imagery Pipelines", "Geospatial Data Handling"],
-  },
-  {
     name: "Developer Tools",
     tags: ["Git", "GitHub", "VS Code", "IntelliJ", "Docker"],
   },
-  {
-    name: "Frameworks",
-    tags: ["Flask", "Flutter", "React", "Laravel", "CodeIgniter", "TensorFlow", "Astro"],
-  },
-  {
-    name: "Concepts",
-    tags: [
-      "Data Structures & Algorithms",
-      "Object-Oriented Programming",
-      "Database Management",
-      "Software Engineering",
-      "Automata Theory",
-      "Artificial Intelligence",
-    ],
-  },
 ];
+
+const EXPEDITION_TITLES = expeditions.map((e) => e.data.title);
+
+// A cluster's field use = every source any of its tools shipped in, in
+// expedition order. When that covers all seven expeditions, say so instead
+// of listing them.
+function clusterUse(cluster: Cluster): { every: boolean; titles: string[] } {
+  const hits = new Set(cluster.extraUse ?? []);
+  for (const tag of cluster.tags) carriedBy(tag).forEach((t) => hits.add(t));
+  const every = EXPEDITION_TITLES.every((t) => hits.has(t));
+  const ordered = [...EXPEDITION_TITLES, "This Site"].filter((t) => hits.has(t));
+  return { every, titles: ordered };
+}
+
+const rows = CLUSTERS.map((c) => ({ ...c, use: clusterUse(c) }));
 ---
 
-<section id="toolkit" class="relative bg-paper px-6 py-32 md:px-12 md:py-40 lg:px-20">
+<section id="toolkit" class="ledger-lines relative bg-paper px-6 py-32 md:px-12 md:py-40 lg:px-20">
   <div class="mx-auto max-w-6xl">
-    <header class="max-w-2xl">
-      <p class="font-mono text-xs uppercase tracking-[0.25em] text-ink/70">
-        Instruments · {CLUSTERS.length} Ecosystems
-      </p>
-      <h2 class="mt-6 font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.95] font-light tracking-tight text-ink">
-        Engineering Toolkit
-      </h2>
-      <p class="mt-8 max-w-xl font-sans text-base leading-relaxed text-ink/80 md:text-lg">
-        The instruments carried on every expedition — clustered by ecosystem,
-        not scored. What matters is what they've built.
-      </p>
+    <header class="flex items-end justify-between gap-10">
+      <div class="max-w-2xl">
+        <p class="font-mono text-xs uppercase tracking-[0.25em] text-ink/70">
+          Instruments
+        </p>
+        <h2 class="mt-6 font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.95] font-light tracking-tight text-ink">
+          Engineering Toolkit
+        </h2>
+      </div>
+
+      {/* Line-drawn compass — same stroke language as Research's FIG
+          diagrams; the single gold center is the shared "rare mark". */}
+      <figure class="hidden shrink-0 md:block" aria-hidden="true">
+        <svg
+          viewBox="0 0 120 120"
+          class="h-28 w-28 text-ink/50"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          focusable="false"
+        >
+          <circle cx="60" cy="60" r="44" />
+          <circle cx="60" cy="60" r="34" stroke-dasharray="3 5" />
+          <line x1="60" y1="8" x2="60" y2="16" />
+          <line x1="60" y1="104" x2="60" y2="112" />
+          <line x1="8" y1="60" x2="16" y2="60" />
+          <line x1="104" y1="60" x2="112" y2="60" />
+          <path d="M60 30 L67 60 L60 90 L53 60 Z" transform="rotate(-28 60 60)" />
+          <circle cx="60" cy="60" r="3" fill="var(--color-gold)" stroke="none" />
+        </svg>
+        <figcaption class="mt-2 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-ink/40">
+          FIG. T-00 · Compass
+        </figcaption>
+      </figure>
     </header>
 
-    <div class="mt-16 columns-1 gap-5 md:columns-2 lg:columns-3">
-      {CLUSTERS.map((cluster, i) => (
-        <article
-          data-toolkit-cluster
-          class="mb-5 break-inside-avoid rounded-sm border border-ink/10 bg-paper-alt/50 p-6 transition-colors hover:border-ink/30"
-        >
-          <div class="flex items-baseline justify-between gap-4">
-            <p class="font-mono text-[11px] tracking-[0.2em] text-ink/60 uppercase">
-              SYS {String(i + 1).padStart(2, "0")}
-            </p>
-            <p class="font-mono text-[10px] tracking-[0.16em] text-ink/40 uppercase">
-              ×{cluster.tags.length}
-            </p>
+    <p class="mt-16 font-mono text-[11px] uppercase tracking-[0.2em] text-ink/60">
+      Primary instruments — proven in shipped work
+    </p>
+    <div class="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {PRIMARY.map((p) => (
+        <article class="flex flex-col rounded-sm border border-ink/15 bg-paper-alt p-6 transition-colors hover:border-ink/35">
+          <div class="flex items-start justify-between gap-4">
+            <h3 class="font-display text-2xl font-light tracking-tight text-ink">
+              {p.tool}
+            </h3>
+            <svg
+              viewBox="0 0 24 24"
+              class="mt-1 h-6 w-6 shrink-0 text-ink/40"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+              set:html={GLYPHS[p.glyph]}
+            />
           </div>
-          <h3 class="mt-2 font-display text-xl font-light tracking-tight text-ink md:text-2xl">
+          <p class="mt-2 flex-1 font-sans text-sm leading-relaxed text-ink/70">
+            {p.role}
+          </p>
+          <p class="mt-5 border-t border-ink/10 pt-3 font-mono text-[10px] uppercase tracking-[0.14em] leading-relaxed text-ocean">
+            {p.use.join(" · ")}
+          </p>
+        </article>
+      ))}
+    </div>
+
+    <p class="mt-20 font-mono text-[11px] uppercase tracking-[0.2em] text-ink/60">
+      Full field kit
+    </p>
+    <div class="mt-6 border-t border-ink/10">
+      {rows.map((cluster) => (
+        <div class="grid gap-2 border-b border-ink/10 py-5 transition-colors hover:bg-paper-alt/40 md:grid-cols-[11rem_1fr] md:gap-8">
+          <h3 class="font-display text-lg font-light tracking-tight text-ink">
             {cluster.name}
           </h3>
-          <ul class="mt-4 flex flex-wrap gap-2">
-            {cluster.tags.map((tag) => (
-              <li class="rounded-sm border border-ink/15 px-2.5 py-1 font-mono text-[10px] tracking-[0.12em] text-ink/70 uppercase">
-                {tag}
-              </li>
-            ))}
-          </ul>
-        </article>
+          <div>
+            <p class="font-mono text-[11px] uppercase tracking-[0.14em] leading-relaxed text-ink/70">
+              {cluster.tags.join(" · ")}
+            </p>
+            {cluster.use.titles.length > 0 && (
+              <p class="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] leading-relaxed text-ocean">
+                Field use: {cluster.use.every ? (
+                  <Fragment>
+                    <span class="mx-0.5 -mt-px inline-block h-1.5 w-1.5 rounded-full bg-gold align-middle" aria-hidden="true"></span> Every expedition
+                  </Fragment>
+                ) : cluster.use.titles.join(" · ")}
+              </p>
+            )}
+          </div>
+        </div>
       ))}
     </div>
   </div>
 </section>
 
-<script>
-  import { initMotion, prefersReducedMotion } from "../lib/motion";
-
-  // Quiet one-time fade-up per cluster — same restraint as the other sections.
-  if (!prefersReducedMotion()) {
-    const { gsap } = initMotion();
-    gsap.utils.toArray<HTMLElement>("[data-toolkit-cluster]").forEach((el) => {
-      gsap.from(el, {
-        y: 24,
-        opacity: 0,
-        duration: 0.7,
-        ease: "power2.out",
-        scrollTrigger: { trigger: el, start: "top 90%" },
-      });
-    });
+<style>
+  /* Faint ruled-ledger ground — the section's equivalent of Research's
+     graph paper: an equipment log, horizontal hairlines only. Kept at
+     near-background contrast so it reads as texture, not decoration. */
+  .ledger-lines {
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-ink) 4%, transparent) 1px,
+      transparent 1px
+    );
+    background-size: 100% 32px;
   }
-</script>
+</style>

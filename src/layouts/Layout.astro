@@ -9,7 +9,7 @@ interface Props {
 }
 
 const {
-  title = "Rolf Garces — Explorer, Engineer, Builder",
+  title = "Rolf Genree Garces — Explorer, Engineer, Builder",
   description = "Building technology that helps people navigate the real world through software, research, and entrepreneurship.",
   url = new URL(Astro.url.pathname, Astro.site).href,
   image = new URL("/assets/images/profile.png", Astro.site).href,
@@ -23,15 +23,40 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0F2C1C" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f3ee" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c1f15" />
+
+    {/* Theme init — must run before first paint so there's no flash of the
+        wrong theme. System preference by default; an explicit choice from
+        the nav toggle (localStorage "theme") wins. While there's no stored
+        choice, live system changes are followed. */}
+    <script is:inline>
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem("theme");
+        } catch (e) {}
+        var mq = matchMedia("(prefers-color-scheme: dark)");
+        var apply = function (t) {
+          document.documentElement.dataset.theme = t;
+        };
+        apply(stored === "light" || stored === "dark" ? stored : mq.matches ? "dark" : "light");
+        mq.addEventListener("change", function (e) {
+          try {
+            if (localStorage.getItem("theme")) return;
+          } catch (err) {}
+          apply(e.matches ? "dark" : "light");
+        });
+      })();
+    </script>
     <link rel="canonical" href={url} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={url} />
     <meta property="og:image" content={image} />
-    <meta property="og:image:alt" content="Rolf Garces profile image" />
-    <meta property="og:site_name" content="Rolf Garces" />
+    <meta property="og:image:alt" content="Rolf Genree Garces profile image" />
+    <meta property="og:site_name" content="Rolf Genree Garces" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

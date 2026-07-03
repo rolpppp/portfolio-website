@@ -1,0 +1,35 @@
+---
+// 404 — "You've wandered off the map." (TO-DO motion pass). Netlify serves
+// dist/404.html automatically for unknown routes on a static deploy.
+import Layout from "../layouts/Layout.astro";
+import TopoBackground from "../components/TopoBackground.astro";
+---
+
+<Layout
+  title="404 — Off the map · Rolf Genree Garces"
+  description="This route doesn't exist — or it hasn't been charted yet."
+>
+  <main class="relative isolate flex min-h-screen flex-col items-center justify-center overflow-hidden bg-paper px-6 py-24 text-center">
+    <TopoBackground />
+
+    <p class="font-mono text-xs uppercase tracking-[0.25em] text-ink/60">
+      404 · Uncharted Territory
+    </p>
+    <h1 class="mt-6 max-w-3xl font-display text-[clamp(2.75rem,8vw,5.5rem)] leading-[0.95] font-light tracking-tight text-ink">
+      You’ve wandered off the map.
+    </h1>
+    <p class="mt-8 max-w-md font-sans text-base leading-relaxed text-ink/80 md:text-lg">
+      This route doesn’t exist — or it hasn’t been charted yet.
+    </p>
+    <a
+      href="/"
+      class="mt-10 inline-flex items-center justify-center rounded-sm bg-ocean px-7 py-3.5 font-sans text-sm font-medium tracking-wide text-paper transition-colors hover:bg-ink"
+    >
+      Back to base camp
+    </a>
+
+    <p class="absolute bottom-8 font-mono text-[11px] uppercase tracking-[0.2em] text-ink/40">
+      10.3725°N · 124.7488°E — Hilongos, Leyte
+    </p>
+  </main>
+</Layout>
